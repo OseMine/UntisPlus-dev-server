@@ -21,6 +21,7 @@ const COLLECTIONS = new Set([
   'homework',
   'absences',
   'messages',
+  'exams',
 ]);
 
 function adminAuthed(req) {

@@ -219,6 +219,8 @@ function buildSeed() {
     },
   ];
 
+  const exams = buildSeedExams();
+
   return {
     schema: 1,
     school: { name: 'demo', longName: 'Demo-Gymnasium Musterstadt' },
@@ -232,8 +234,63 @@ function buildSeed() {
     homework,
     absences,
     messages,
+    exams,
     holidays: HOLIDAYS,
   };
+}
+
+// Exams (Prüfungen) seed – relative dates so the demo always shows upcoming
+// AND past exams inside the app's request window (14 days back / 90 ahead).
+function buildSeedExams() {
+  const day = (offset) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return dateInt(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  };
+  return [
+    {
+      id: 1, classIds: [45], subjectId: 1, subject: 'Mathematik', examType: 'Schularbeit',
+      date: day(18), startTime: 850, endTime: 940,
+      teachers: ['Frau Weber'], teacherIds: [2], rooms: ['R101'], roomIds: [1],
+      description: 'Kapitel 1–3: Natürliche Zahlen, Grundrechenarten',
+    },
+    {
+      id: 2, classIds: [45], subjectId: 3, subject: 'Englisch', examType: 'Vokabeltest',
+      date: day(26), startTime: 935, endTime: 1020,
+      teachers: ['Frau Müller'], teacherIds: [3], rooms: ['R102'], roomIds: [2],
+      description: 'Unit 2: Wortschatz und Smalltalk',
+    },
+    {
+      id: 3, classIds: [45], subjectId: 2, subject: 'Deutsch', examType: 'Diktat',
+      date: day(34), startTime: 745, endTime: 830,
+      teachers: ['Frau Weber'], teacherIds: [1], rooms: ['R101'], roomIds: [1],
+      description: 'Diktat „Der herbstliche Wald“',
+    },
+    {
+      id: 4, classIds: [45], subjectId: 4, subject: 'Biologie', examType: 'Stegreif',
+      date: day(-10), startTime: 1025, endTime: 1110,
+      teachers: ['Herr Fischer'], teacherIds: [4], rooms: ['R201'], roomIds: [4],
+      description: 'Aufbau von Blütenpflanzen',
+    },
+    {
+      id: 5, classIds: [47], subjectId: 9, subject: 'Physik', examType: 'Schularbeit',
+      date: day(52), startTime: 850, endTime: 940,
+      teachers: ['Herr Hoffmann'], teacherIds: [6], rooms: ['PC1'], roomIds: [9],
+      description: 'Elektrizitätslehre: Schaltungen',
+    },
+    {
+      id: 6, classIds: [48], subjectId: 5, subject: 'Geschichte', examType: 'Referat',
+      date: day(74), startTime: 935, endTime: 1020,
+      teachers: ['Frau Becker'], teacherIds: [5], rooms: ['R202'], roomIds: [5],
+      description: 'Präsentation: Das Mittelalter',
+    },
+    {
+      id: 7, classIds: [46], subjectId: 3, subject: 'Englisch', examType: 'Schularbeit',
+      date: day(40), startTime: 1120, endTime: 1205,
+      teachers: ['Frau Müller'], teacherIds: [3], rooms: ['R110'], roomIds: [3],
+      description: 'Unit 1–2: Grammar and Writing',
+    },
+  ];
 }
 
 let store = null;
@@ -250,6 +307,10 @@ export function getStore() {
   }
   if (!store) {
     store = buildSeed();
+    saveStore();
+  }
+  if (!Array.isArray(store.exams)) {
+    store.exams = buildSeedExams();
     saveStore();
   }
   return store;

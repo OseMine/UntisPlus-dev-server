@@ -4,71 +4,493 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Untis+ Dev Server – Admin</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400..700&display=swap" rel="stylesheet">
 <style>
+  /* =====================================================================
+     Material Design 3 – Admin-Panel (Web: CSS-only Token-System)
+     Basistheme: Material Baseline · Light + Dark (System + Toggle)
+     Komponenten: Navigation Drawer, Top App Bar, Buttons, Outlined Fields,
+     Filter-Chips, Cards, Tables, Snackbar, Badges.
+     ===================================================================== */
   :root {
-    --bg: #0f1420; --panel: #1a2233; --panel2: #22304a; --border: #2c3a58;
-    --text: #e6ecf5; --muted: #8fa3c4; --accent: #4f8cff; --accent2: #2f6fe4;
-    --ok: #34d399; --warn: #fbbf24; --bad: #f87171;
+    color-scheme: light;
+    /* ---- Color · Light (Material Baseline) ---- */
+    --md-sys-color-primary: #6750a4;
+    --md-sys-color-on-primary: #ffffff;
+    --md-sys-color-primary-container: #eaddff;
+    --md-sys-color-on-primary-container: #21005d;
+    --md-sys-color-secondary: #625b71;
+    --md-sys-color-on-secondary: #ffffff;
+    --md-sys-color-secondary-container: #e8def8;
+    --md-sys-color-on-secondary-container: #1d192b;
+    --md-sys-color-tertiary: #7d5260;
+    --md-sys-color-on-tertiary: #ffffff;
+    --md-sys-color-tertiary-container: #ffd8e4;
+    --md-sys-color-on-tertiary-container: #31111d;
+    --md-sys-color-error: #b3261e;
+    --md-sys-color-on-error: #ffffff;
+    --md-sys-color-error-container: #f9dedc;
+    --md-sys-color-on-error-container: #410e0b;
+    --md-sys-color-surface: #fef7ff;
+    --md-sys-color-on-surface: #1d1b20;
+    --md-sys-color-on-surface-variant: #49454f;
+    --md-sys-color-surface-dim: #ded8e1;
+    --md-sys-color-surface-bright: #fef7ff;
+    --md-sys-color-surface-container-lowest: #ffffff;
+    --md-sys-color-surface-container-low: #f7f2fa;
+    --md-sys-color-surface-container: #f3edf7;
+    --md-sys-color-surface-container-high: #ece6f0;
+    --md-sys-color-surface-container-highest: #e6e0e9;
+    --md-sys-color-inverse-surface: #322f35;
+    --md-sys-color-inverse-on-surface: #f5eff7;
+    --md-sys-color-inverse-primary: #d0bcff;
+    --md-sys-color-outline: #79747e;
+    --md-sys-color-outline-variant: #cac4d0;
+    --md-sys-color-scrim: rgba(0, 0, 0, 0.4);
+    /* ---- Shape ---- */
+    --md-sys-shape-corner-none: 0px;
+    --md-sys-shape-corner-extra-small: 4px;
+    --md-sys-shape-corner-small: 8px;
+    --md-sys-shape-corner-medium: 12px;
+    --md-sys-shape-corner-large: 16px;
+    --md-sys-shape-corner-extra-large: 28px;
+    --md-sys-shape-corner-full: 9999px;
+    /* ---- Motion (Web-Fallback: Timing + Easing) ---- */
+    --md-sys-motion-duration-short: 150ms;
+    --md-sys-motion-duration-medium: 300ms;
+    --md-sys-motion-duration-long: 400ms;
+    --md-sys-motion-easing-linear: cubic-bezier(0, 0, 1, 1);
+    --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+    /* ---- Elevation (nur Snackbar) ---- */
+    --md-sys-elevation-level3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+    /* ---- Typography (Roboto Flex) ---- */
+    --md-sys-typescale-display-small: 400 36px/44px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-headline-small: 400 24px/32px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-title-large: 400 22px/28px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-title-medium: 500 16px/24px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-title-small: 500 14px/20px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-body-large: 400 16px/24px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-body-medium: 400 14px/20px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-body-small: 400 12px/16px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-label-large: 500 14px/20px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-label-large-prominent: 700 14px/20px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-label-medium: 500 12px/16px "Roboto Flex", Roboto, system-ui, sans-serif;
+    --md-sys-typescale-label-small: 500 11px/16px "Roboto Flex", Roboto, system-ui, sans-serif;
   }
+
+  /* ---- Color · Dark (Material Baseline) ---- */
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --md-sys-color-primary: #d0bcff;
+    --md-sys-color-on-primary: #381e72;
+    --md-sys-color-primary-container: #4f378b;
+    --md-sys-color-on-primary-container: #eaddff;
+    --md-sys-color-secondary: #ccc2dc;
+    --md-sys-color-on-secondary: #332d41;
+    --md-sys-color-secondary-container: #4a4458;
+    --md-sys-color-on-secondary-container: #e8def8;
+    --md-sys-color-tertiary: #efb8c8;
+    --md-sys-color-on-tertiary: #492532;
+    --md-sys-color-tertiary-container: #633b48;
+    --md-sys-color-on-tertiary-container: #ffd8e4;
+    --md-sys-color-error: #f2b8b5;
+    --md-sys-color-on-error: #601410;
+    --md-sys-color-error-container: #8c1d18;
+    --md-sys-color-on-error-container: #f9dedc;
+    --md-sys-color-surface: #141218;
+    --md-sys-color-on-surface: #e6e0e9;
+    --md-sys-color-on-surface-variant: #cac4d0;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #3b383e;
+    --md-sys-color-surface-container-lowest: #0f0d13;
+    --md-sys-color-surface-container-low: #1d1b20;
+    --md-sys-color-surface-container: #211f26;
+    --md-sys-color-surface-container-high: #2b2930;
+    --md-sys-color-surface-container-highest: #36343b;
+    --md-sys-color-inverse-surface: #e6e0e9;
+    --md-sys-color-inverse-on-surface: #322f35;
+    --md-sys-color-inverse-primary: #6750a4;
+    --md-sys-color-outline: #938f99;
+    --md-sys-color-outline-variant: #49454f;
+  }
+
+  /* ---- Color · Dark (System-Präferenz, solange kein manueller Wert) ---- */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --md-sys-color-primary: #d0bcff;
+      --md-sys-color-on-primary: #381e72;
+      --md-sys-color-primary-container: #4f378b;
+      --md-sys-color-on-primary-container: #eaddff;
+      --md-sys-color-secondary: #ccc2dc;
+      --md-sys-color-on-secondary: #332d41;
+      --md-sys-color-secondary-container: #4a4458;
+      --md-sys-color-on-secondary-container: #e8def8;
+      --md-sys-color-tertiary: #efb8c8;
+      --md-sys-color-on-tertiary: #492532;
+      --md-sys-color-tertiary-container: #633b48;
+      --md-sys-color-on-tertiary-container: #ffd8e4;
+      --md-sys-color-error: #f2b8b5;
+      --md-sys-color-on-error: #601410;
+      --md-sys-color-error-container: #8c1d18;
+      --md-sys-color-on-error-container: #f9dedc;
+      --md-sys-color-surface: #141218;
+      --md-sys-color-on-surface: #e6e0e9;
+      --md-sys-color-on-surface-variant: #cac4d0;
+      --md-sys-color-surface-dim: #141218;
+      --md-sys-color-surface-bright: #3b383e;
+      --md-sys-color-surface-container-lowest: #0f0d13;
+      --md-sys-color-surface-container-low: #1d1b20;
+      --md-sys-color-surface-container: #211f26;
+      --md-sys-color-surface-container-high: #2b2930;
+      --md-sys-color-surface-container-highest: #36343b;
+      --md-sys-color-inverse-surface: #e6e0e9;
+      --md-sys-color-inverse-on-surface: #322f35;
+      --md-sys-color-inverse-primary: #6750a4;
+      --md-sys-color-outline: #938f99;
+      --md-sys-color-outline-variant: #49454f;
+    }
+  }
+
+  /* =====================================================================
+     Basis
+     ===================================================================== */
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
-  .wrap { display: flex; min-height: 100vh; }
-  aside { width: 230px; background: var(--panel); border-right: 1px solid var(--border); padding: 16px 10px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-  aside h1 { font-size: 15px; margin: 0 8px 14px; color: var(--accent); }
-  aside .sub { font-size: 11px; color: var(--muted); margin: -8px 8px 14px; }
-  aside button { display: block; width: 100%; text-align: left; background: none; border: none; color: var(--muted); padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 2px; }
-  aside button:hover { background: var(--panel2); color: var(--text); }
-  aside button.active { background: var(--accent2); color: #fff; }
-  main { flex: 1; padding: 24px 30px; max-width: 1200px; }
-  section { display: none; }
-  section.active { display: block; }
-  h2 { margin: 0 0 18px; font-size: 20px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-  .card .n { font-size: 26px; font-weight: 700; color: var(--accent); }
-  .card .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
-  .panel h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
-  tr:hover td { background: var(--panel2); }
-  input, select, textarea, button.btn {
-    background: var(--panel2); border: 1px solid var(--border); color: var(--text);
-    border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit;
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font: var(--md-sys-typescale-body-medium);
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
   }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent2); }
-  button.btn { background: var(--accent2); cursor: pointer; border: none; font-weight: 600; }
-  button.btn:hover { filter: brightness(1.15); }
-  button.btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  button.btn.danger { background: transparent; border: 1px solid var(--bad); color: var(--bad); }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
-  .field { display: flex; flex-direction: column; gap: 4px; }
-  .field label { font-size: 11px; color: var(--muted); }
+  ::selection { background: var(--md-sys-color-primary-container); }
+  code {
+    background: var(--md-sys-color-surface-container-high);
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    padding: 1px 6px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.9em;
+    color: var(--md-sys-color-primary);
+  }
+  :focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 2px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-full);
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* =====================================================================
+     Layout: Drawer + Main (Top App Bar)
+     ===================================================================== */
+  .wrap { display: flex; min-height: 100vh; align-items: stretch; }
+
+  aside {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    flex-shrink: 0; width: 280px;
+    background: var(--md-sys-color-surface-container);
+    border-right: 1px solid var(--md-sys-color-outline-variant);
+    padding: 24px 12px 16px;
+  }
+  .md3-brand { display: flex; gap: 12px; align-items: center; padding: 0 12px 22px; }
+  .md3-brand__logo {
+    flex-shrink: 0; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; line-height: 1;
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    border-radius: var(--md-sys-shape-corner-medium);
+  }
+  aside h1 { margin: 0; font: var(--md-sys-typescale-title-medium); color: var(--md-sys-color-on-surface); }
+  aside .sub { font: var(--md-sys-typescale-body-small); color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+
+  /* ---- Navigation Drawer Items ---- */
+  .navitem {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; height: 48px; padding: 0 16px; margin-bottom: 4px;
+    border: none; border-radius: var(--md-sys-shape-corner-full);
+    background: transparent; color: var(--md-sys-color-on-surface-variant);
+    font: var(--md-sys-typescale-label-large);
+    letter-spacing: 0.1px; text-align: left; cursor: pointer;
+    transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  .navitem:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 8%, transparent); }
+  .navitem:active { background: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 12%, transparent); }
+  .navitem.active {
+    position: relative;
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    font: var(--md-sys-typescale-label-large-prominent);
+  }
+  .navitem.active::before {
+    content: ""; position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
+    width: 4px; height: 24px; border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-on-secondary-container);
+  }
+  .md3-ic {
+    flex-shrink: 0; width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 20px; line-height: 1;
+  }
+
+  main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .md3-topbar {
+    position: sticky; top: 0; z-index: 20;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 0 24px;
+    background: var(--md-sys-color-surface);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .md3-topbar__title {
+    margin: 0; font: var(--md-sys-typescale-title-large); color: var(--md-sys-color-on-surface);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .md3-topbar__actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .iconbtn {
+    width: 40px; height: 40px; border: none; border-radius: var(--md-sys-shape-corner-full);
+    background: transparent; color: var(--md-sys-color-on-surface-variant);
+    font-size: 18px; line-height: 1; cursor: pointer;
+    transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  .iconbtn:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 8%, transparent); }
+  .iconbtn:active { background: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 12%, transparent); }
+
+  .md3-main-body { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+
+  main section { display: none; }
+  main section.active {
+    display: block;
+    animation: md3-enter var(--md-sys-motion-duration-long) var(--md-sys-motion-easing-emphasized-decelerate);
+  }
+  @keyframes md3-enter { from { opacity: 0; transform: translateY(8px); } }
+
+  /* =====================================================================
+     Oberflächen: Cards + Panels
+     ===================================================================== */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .card {
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-medium);
+    padding: 16px;
+    transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  .card:hover { background: var(--md-sys-color-surface-container); }
+  .card .n { font: var(--md-sys-typescale-headline-small); color: var(--md-sys-color-primary); }
+  .card .l { font: var(--md-sys-typescale-body-medium); color: var(--md-sys-color-on-surface-variant); margin-top: 4px; }
+
+  .panel {
+    background: var(--md-sys-color-surface);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    padding: 16px 20px; margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .panel h3 { margin: 0 0 14px; font: var(--md-sys-typescale-title-medium); color: var(--md-sys-color-on-surface); }
+
+  /* =====================================================================
+     Tabellen
+     ===================================================================== */
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--md-sys-color-outline-variant); font: var(--md-sys-typescale-body-medium); }
+  th { font: var(--md-sys-typescale-label-small); color: var(--md-sys-color-on-surface-variant); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+  tbody tr { transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard); }
+  tbody tr:hover { background: var(--md-sys-color-surface-container-high); }
+
+  /* =====================================================================
+     Formulare: Outlined Text Fields + Buttons
+     ===================================================================== */
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font: var(--md-sys-typescale-label-medium); color: var(--md-sys-color-on-surface-variant); }
+  .field:has(input[type="checkbox"]) { flex-direction: row; align-items: center; gap: 8px; }
+
+  input, select, textarea {
+    font: var(--md-sys-typescale-body-medium);
+    color: var(--md-sys-color-on-surface);
+    background: transparent;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: var(--md-sys-shape-corner-small);
+    padding: 9px 11px;
+    min-height: 40px;
+    transition: border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) { border-color: var(--md-sys-color-on-surface); }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border: 2px solid var(--md-sys-color-primary); padding: 8px 10px;
+  }
+  input[type="checkbox"] { accent-color: var(--md-sys-color-primary); min-height: auto; }
+  input[type="color"] { padding: 2px 4px; min-height: 34px; width: 64px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 40px; padding: 0 24px; border: none;
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+    font: var(--md-sys-typescale-label-large); letter-spacing: 0.1px;
+    cursor: pointer; text-decoration: none;
+    transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  .btn:hover { background: color-mix(in srgb, var(--md-sys-color-primary) 92%, var(--md-sys-color-on-primary)); }
+  .btn:active { background: color-mix(in srgb, var(--md-sys-color-primary) 84%, var(--md-sys-color-on-primary)); }
+  .btn.ghost { background: transparent; border: 1px solid var(--md-sys-color-outline); color: var(--md-sys-color-primary); }
+  .btn.ghost:hover { background: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent); }
+  .btn.ghost:active { background: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent); }
+  .btn.danger { background: transparent; color: var(--md-sys-color-error); }
+  .btn.danger:hover { background: color-mix(in srgb, var(--md-sys-color-error) 8%, transparent); }
+  .btn.danger:active { background: color-mix(in srgb, var(--md-sys-color-error) 12%, transparent); }
+
+  /* =====================================================================
+     Chips / Badges / Dot
+     ===================================================================== */
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chips label { display: flex; gap: 6px; align-items: center; font-size: 13px; background: var(--panel2); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; cursor: pointer; }
-  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--panel2); color: var(--muted); }
-  .badge.news { background: #1e3a5f; color: #7cc0ff; }
-  .badge.inbox { background: #2f4b2f; color: #7bd88a; }
+  .chips label {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 32px; padding: 0 16px;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface-variant);
+    font: var(--md-sys-typescale-label-medium);
+    cursor: pointer;
+    transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  .chips label:hover { border-color: var(--md-sys-color-on-surface); }
+  .chips label:has(input:checked) {
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    border-color: transparent;
+  }
+  .badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: var(--md-sys-shape-corner-full);
+    font: var(--md-sys-typescale-label-medium);
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .badge.news { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+  .badge.inbox { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .badge.ok { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .badge.warn { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
   .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
-  .grid { display: grid; grid-template-columns: 90px repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 12px; }
-  .grid > div { background: var(--panel); padding: 8px; min-height: 64px; }
-  .grid .head { background: var(--panel2); font-weight: 600; color: var(--muted); display: flex; align-items: center; }
-  .lesson { border-radius: 6px; padding: 5px 7px; margin-bottom: 5px; cursor: pointer; border: 1px solid rgba(255,255,255,.15); }
-  .lesson small { display: block; color: rgba(255,255,255,.8); font-size: 10px; }
-  .empty { color: var(--muted); font-size: 11px; text-align: center; padding: 12px 0; }
-  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--ok); color: #06251b; padding: 12px 18px; border-radius: 10px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.4); display: none; z-index: 10; }
-  .toast.err { background: var(--bad); color: #2b0a0a; }
-  #login { max-width: 360px; margin: 120px auto; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 30px; }
-  #login h1 { margin: 0 0 18px; font-size: 18px; color: var(--accent); }
-  .actions { display: flex; gap: 10px; margin-top: 12px; }
-  .msg { border-left: 3px solid var(--accent); padding: 8px 12px; margin-bottom: 8px; background: var(--panel2); border-radius: 0 8px 8px 0; font-size: 13px; }
-  .msg .mdate { color: var(--muted); font-size: 11px; }
-  .msg .mfrom { color: var(--muted); font-size: 11px; }
+  .muted { color: var(--md-sys-color-on-surface-variant); }
+
+  /* =====================================================================
+     Stundenplan-Grid
+     ===================================================================== */
+  .grid {
+    display: grid; grid-template-columns: 96px repeat(5, 1fr);
+    gap: 1px; background: var(--md-sys-color-outline-variant);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    overflow: hidden; font-size: 12px;
+  }
+  .grid > div { background: var(--md-sys-color-surface); padding: 8px; min-height: 64px; }
+  .grid .head {
+    background: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface-variant);
+    font: var(--md-sys-typescale-label-medium);
+    text-align: center;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lesson {
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    padding: 6px 8px; margin-bottom: 5px; cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    transition: filter var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  }
+  .lesson:hover { filter: brightness(1.12); }
+  .lesson small { display: block; color: rgba(255, 255, 255, 0.85); font-size: 10px; }
+  .empty { color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-small); text-align: center; padding: 12px 0; }
+
+  /* =====================================================================
+     Snackbar (Toast)
+     ===================================================================== */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 60;
+    max-width: min(420px, calc(100vw - 48px));
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    padding: 14px 16px;
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    font: var(--md-sys-typescale-body-medium);
+    box-shadow: var(--md-sys-elevation-level3);
+    display: none;
+    animation: snackbar-in var(--md-sys-motion-duration-long) var(--md-sys-motion-easing-emphasized-decelerate);
+  }
+  .toast.err { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+  @keyframes snackbar-in { from { opacity: 0; transform: translateY(16px); } }
+
+  /* =====================================================================
+     Login
+     ===================================================================== */
+  #login {
+    width: min(400px, calc(100vw - 48px));
+    margin: 96px auto; padding: 32px;
+    background: var(--md-sys-color-surface-container-high);
+    border-radius: var(--md-sys-shape-corner-extra-large);
+  }
+  #login h1 { margin: 0 0 20px; font: var(--md-sys-typescale-headline-small); color: var(--md-sys-color-primary); }
+  #login .btn { margin-top: 20px; width: 100%; }
+
+  /* =====================================================================
+     Nachrichten
+     ===================================================================== */
+  .actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .msg {
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-medium);
+    padding: 12px 16px; margin-bottom: 10px;
+    font: var(--md-sys-typescale-body-medium);
+  }
+  .msg .mdate, .msg .mfrom { font: var(--md-sys-typescale-label-small); color: var(--md-sys-color-on-surface-variant); }
+
+  /* Rohdaten-Vorschau */
+  .raw {
+    background: var(--md-sys-color-surface-container-high);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-small);
+    padding: 14px; max-height: 420px; overflow: auto;
+    font: var(--md-sys-typescale-body-small);
+    color: var(--md-sys-color-on-surface-variant);
+    white-space: pre-wrap;
+  }
+
+  /* =====================================================================
+     Responsive (Small Window Size Class)
+     ===================================================================== */
+  @media (max-width: 720px) {
+    .wrap { flex-direction: column; }
+    aside { position: static; width: 100%; height: auto; overflow: visible; padding: 16px; }
+    .md3-nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .navitem { width: auto; flex: 1 1 auto; justify-content: center; padding: 0 12px; }
+    .navitem.active::before { display: none; }
+    .md3-main-body { padding: 16px; }
+    .md3-topbar { padding: 0 16px; height: 56px; }
+    .grid { grid-template-columns: repeat(6, minmax(110px, 1fr)); }
+    .toast { left: 24px; right: 24px; max-width: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div id="login" hidden>
   <h1>🔐 Admin-Login</h1>
@@ -77,34 +499,50 @@
 </div>
 
 <div class="wrap" id="app" hidden>
-  <aside>
-    <h1>🛠 Untis+ Dev Server</h1>
-    <div class="sub">Admin-Panel · Daten in <code>data/db.json</code></div>
-    <button data-sec="dashboard" class="active" onclick="show('dashboard')">📊 Dashboard</button>
-    <button data-sec="classes" onclick="show('classes')">🏫 Klassen</button>
-    <button data-sec="teachers" onclick="show('teachers')">👩🏫 Lehrer</button>
-    <button data-sec="subjects" onclick="show('subjects')">📚 Fächer</button>
-    <button data-sec="rooms" onclick="show('rooms')">🚪 Räume</button>
-    <button data-sec="students" onclick="show('students')">🧑‍🎓 Schüler</button>
-    <button data-sec="timetable" onclick="show('timetable')">🗓 Stundenplan</button>
-    <button data-sec="homework" onclick="show('homework')">📝 Hausaufgaben</button>
-    <button data-sec="absences" onclick="show('absences')">🩺 Absenzen</button>
-    <button data-sec="messages" onclick="show('messages')">✉️ Nachrichten</button>
-    <button data-sec="data" onclick="show('data')">💾 Daten</button>
+  <aside role="navigation" aria-label="Hauptnavigation">
+    <div class="md3-brand">
+      <div class="md3-brand__logo" aria-hidden="true">🛠</div>
+      <div>
+        <h1>Untis+ Dev Server</h1>
+        <div class="sub">Admin-Panel · Daten in <code>data/db.json</code></div>
+      </div>
+    </div>
+    <div class="md3-nav">
+      <button class="navitem active" data-sec="dashboard" data-label="Dashboard" onclick="show('dashboard')"><span class="md3-ic" aria-hidden="true">📊</span>Dashboard</button>
+      <button class="navitem" data-sec="classes" data-label="Klassen" onclick="show('classes')"><span class="md3-ic" aria-hidden="true">🏫</span>Klassen</button>
+      <button class="navitem" data-sec="teachers" data-label="Lehrer" onclick="show('teachers')"><span class="md3-ic" aria-hidden="true">👩🏫</span>Lehrer</button>
+      <button class="navitem" data-sec="subjects" data-label="Fächer" onclick="show('subjects')"><span class="md3-ic" aria-hidden="true">📚</span>Fächer</button>
+      <button class="navitem" data-sec="rooms" data-label="Räume" onclick="show('rooms')"><span class="md3-ic" aria-hidden="true">🚪</span>Räume</button>
+      <button class="navitem" data-sec="students" data-label="Schüler" onclick="show('students')"><span class="md3-ic" aria-hidden="true">🧑‍🎓</span>Schüler</button>
+      <button class="navitem" data-sec="timetable" data-label="Stundenplan" onclick="show('timetable')"><span class="md3-ic" aria-hidden="true">🗓</span>Stundenplan</button>
+      <button class="navitem" data-sec="homework" data-label="Hausaufgaben" onclick="show('homework')"><span class="md3-ic" aria-hidden="true">📝</span>Hausaufgaben</button>
+      <button class="navitem" data-sec="absences" data-label="Absenzen" onclick="show('absences')"><span class="md3-ic" aria-hidden="true">🩺</span>Absenzen</button>
+      <button class="navitem" data-sec="messages" data-label="Nachrichten" onclick="show('messages')"><span class="md3-ic" aria-hidden="true">✉️</span>Nachrichten</button>
+      <button class="navitem" data-sec="data" data-label="Daten" onclick="show('data')"><span class="md3-ic" aria-hidden="true">💾</span>Daten</button>
+    </div>
   </aside>
 
   <main>
-    <section id="sec-dashboard" class="active"></section>
-    <section id="sec-classes"></section>
-    <section id="sec-teachers"></section>
-    <section id="sec-subjects"></section>
-    <section id="sec-rooms"></section>
-    <section id="sec-students"></section>
-    <section id="sec-timetable"></section>
-    <section id="sec-homework"></section>
-    <section id="sec-absences"></section>
-    <section id="sec-messages"></section>
-    <section id="sec-data"></section>
+    <header class="md3-topbar">
+      <h2 class="md3-topbar__title" id="topbar-title">Dashboard</h2>
+      <div class="md3-topbar__actions">
+        <button class="iconbtn" id="theme-toggle" onclick="toggleTheme()" aria-label="Helles und dunkles Design umschalten" title="Hell/Dunkel umschalten">🌙</button>
+        <button class="iconbtn" onclick="load()" aria-label="Daten neu laden" title="Daten neu laden">🔄</button>
+      </div>
+    </header>
+    <div class="md3-main-body">
+      <section id="sec-dashboard" class="active"></section>
+      <section id="sec-classes"></section>
+      <section id="sec-teachers"></section>
+      <section id="sec-subjects"></section>
+      <section id="sec-rooms"></section>
+      <section id="sec-students"></section>
+      <section id="sec-timetable"></section>
+      <section id="sec-homework"></section>
+      <section id="sec-absences"></section>
+      <section id="sec-messages"></section>
+      <section id="sec-data"></section>
+    </div>
   </main>
 </div>
 
@@ -142,8 +580,16 @@ async function load() {
   renderAll();
 }
 function show(section) {
-  $$('aside button').forEach((b) => b.classList.toggle('active', b.dataset.sec === section));
+  $$('aside button').forEach((b) => {
+    const active = b.dataset.sec === section;
+    b.classList.toggle('active', active);
+    if (active) b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  });
   $$('main section').forEach((s) => s.classList.toggle('active', s.id === 'sec-' + section));
+  const nav = $('aside button[data-sec="' + section + '"]');
+  const t = $('#topbar-title');
+  if (t && nav && nav.dataset.label) t.textContent = nav.dataset.label;
   renderSection(section);
 }
 function renderAll() {
@@ -186,7 +632,6 @@ function dashboard() {
   };
   let cards = Object.entries(counts).map(([l, n]) => `<div class="card"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
   el.innerHTML = `
-    <h2>📊 Dashboard</h2>
     <div class="panel">
       <h3>Schule</h3>
       <p style="margin:0"><b>${esc(DB.school.longName || DB.school.name)}</b> · Schuljahr <b>${esc(DB.schoolYear.name || '')}</b> · Daten-Pfad: <code>data/db.json</code></p>
@@ -203,7 +648,7 @@ function dashboard() {
     </div>
     <div class="panel">
       <h3>Wie funktioniert es?</h3>
-      <p style="color:var(--muted);font-size:13px;line-height:1.6;margin:0">
+      <p class="muted" style="line-height:1.6;margin:0">
         Alle Änderungen hier werden sofort in <code>data/db.json</code> gespeichert und von der simulierten WebUntis-API ausgeliefert.
         Der Test-Account <b>testuser</b> ist Schüler <b>Max Mustermann (id 123)</b> aus der <b>${esc(classOf(45))}</b>.
         Melde dich in der Untis+ App an und wechsle ggf. die Klasse, um deine Änderungen zu sehen.
@@ -243,7 +688,6 @@ function classes() {
       <td><button class="btn danger" onclick="del('classes',${c.id})">✕</button></td>
     </tr>`).join('');
   el.innerHTML = `
-    <h2>🏫 Klassen</h2>
     <div class="panel"><h3>Neue Klasse</h3>${tableFormRow(
       fld('name', 'Kürzel', 'text', '', null, 'placeholder="5A"') +
       fld('longName', 'Name', 'text', '', null, 'placeholder="Klasse 5A"') +
@@ -252,7 +696,7 @@ function classes() {
       "add('classes')")}
     </div>
     <div class="panel"><h3>Alle Klassen</h3>
-      <table><thead><tr><th>Kürzel</th><th>Name</th><th>Klassenlehrer</th><th>Raum</th><th>Schüler</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Kürzel</th><th scope="col">Name</th><th scope="col">Klassenlehrer</th><th scope="col">Raum</th><th scope="col">Schüler</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="6" class="empty">Keine Klassen vorhanden</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -263,7 +707,6 @@ function teachers() {
     <tr><td>${esc(t.name)}</td><td>${esc(t.longName)}</td><td>${esc(t.email)}</td><td>${esc(t.initials)}</td>
     <td><button class="btn danger" onclick="del('teachers',${t.id})">✕</button></td></tr>`).join('');
   el.innerHTML = `
-    <h2>👩‍🏫 Lehrer (${DB.teachers.length})</h2>
     <div class="panel"><h3>Neuer Lehrer</h3>${tableFormRow(
       fld('name', 'Name (Nachname, Vorname)', 'text', '', null, 'placeholder="Weber, Anna"') +
       fld('longName', 'Anrede/Anzeigename', 'text', '', null, 'placeholder="Frau Weber"') +
@@ -272,7 +715,7 @@ function teachers() {
       "add('teachers')")}
     </div>
     <div class="panel"><h3>Alle Lehrer</h3>
-      <table><thead><tr><th>Name</th><th>Anzeigename</th><th>E-Mail</th><th>Kürzel</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Name</th><th scope="col">Anzeigename</th><th scope="col">E-Mail</th><th scope="col">Kürzel</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="5" class="empty">Keine Lehrer vorhanden</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -284,14 +727,13 @@ function subjects() {
     <td>${esc(s.longName)}</td><td>${esc(s.color)}</td>
     <td><button class="btn danger" onclick="del('subjects',${s.id})">✕</button></td></tr>`).join('');
   el.innerHTML = `
-    <h2>📚 Fächer (${DB.subjects.length})</h2>
     <div class="panel"><h3>Neues Fach</h3>${tableFormRow(
       fld('name', 'Kürzel', 'text', '', null, 'placeholder="M"') +
       fld('longName', 'Name', 'text', '', null, 'placeholder="Mathematik"') +
       fld('color', 'Farbe', 'color'), "add('subjects')")}
     </div>
     <div class="panel"><h3>Alle Fächer</h3>
-      <table><thead><tr><th>Fach</th><th>Name</th><th>Farbe</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Fach</th><th scope="col">Name</th><th scope="col">Farbe</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="4" class="empty">Keine Fächer vorhanden</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -302,13 +744,12 @@ function rooms() {
     <tr><td><b>${esc(r.name)}</b></td><td>${esc(r.longName)}</td>
     <td><button class="btn danger" onclick="del('rooms',${r.id})">✕</button></td></tr>`).join('');
   el.innerHTML = `
-    <h2>🚪 Räume (${DB.rooms.length})</h2>
     <div class="panel"><h3>Neuer Raum</h3>${tableFormRow(
       fld('name', 'Kürzel', 'text', '', null, 'placeholder="R101"') +
       fld('longName', 'Name', 'text', '', null, 'placeholder="Raum 101"'), "add('rooms')")}
     </div>
     <div class="panel"><h3>Alle Räume</h3>
-      <table><thead><tr><th>Kürzel</th><th>Name</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Kürzel</th><th scope="col">Name</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="3" class="empty">Keine Räume vorhanden</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -320,14 +761,13 @@ function students() {
     <tr><td>${esc(s.lastName)}, ${esc(s.firstName)}</td><td>${esc(classOf(s.classId))}</td><td>#${s.id}</td>
     <td><button class="btn danger" onclick="del('students',${s.id})">✕</button></td></tr>`).join('');
   el.innerHTML = `
-    <h2>🧑‍🎓 Schüler (${DB.students.length})</h2>
     <div class="panel"><h3>Neuer Schüler</h3>${tableFormRow(
       fld('firstName', 'Vorname', 'text', '', null, 'placeholder="Emma"') +
       fld('lastName', 'Nachname', 'text', '', null, 'placeholder="Braun"') +
       fld('classId', 'Klasse', 'select', '', classOpts), "add('students')")}
     </div>
     <div class="panel"><h3>Alle Schüler</h3>
-      <table><thead><tr><th>Name</th><th>Klasse</th><th>ID</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Name</th><th scope="col">Klasse</th><th scope="col">ID</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="4" class="empty">Keine Schüler vorhanden</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -338,7 +778,6 @@ function timetable() {
   const el = $('#sec-timetable');
   const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
   el.innerHTML = `
-    <h2>🗓 Stundenplan</h2>
     <div class="panel">
       <div class="row">
         ${fld('tt-class', 'Klasse', 'select', ttClass ?? '', classOpts)}
@@ -354,7 +793,7 @@ function timetableBody() {
   const head = ['Zeit', ...WEEKDAYS().map((d) => `<div class="head">${d}</div>`)].join('');
   const cells = [];
   for (let p = 1; p <= 7; p++) {
-    cells.push(`<div class="head">${p}. Std.<br><small style="color:var(--muted)">${intToTime(PERIOD_TIMES[p - 1][0])}–${intToTime(PERIOD_TIMES[p - 1][1])}</small></div>`);
+    cells.push(`<div class="head">${p}. Std.<br><small class="muted">${intToTime(PERIOD_TIMES[p - 1][0])}–${intToTime(PERIOD_TIMES[p - 1][1])}</small></div>`);
     for (let wd = 1; wd <= 5; wd++) {
       const list = byKey[wd + '-' + p] || [];
       const html = list.map((l) => {
@@ -374,7 +813,7 @@ function timetableBody() {
     </div>
     ${form}
     <div class="panel"><h3>Alle Stunden dieser Klasse</h3>
-      <table><thead><tr><th>Tag</th><th>Zeit</th><th>Fach</th><th>Lehrer</th><th>Raum</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Tag</th><th scope="col">Zeit</th><th scope="col">Fach</th><th scope="col">Lehrer</th><th scope="col">Raum</th><th scope="col"></th></tr></thead>
       <tbody>${lessons.sort((a, b) => a.weekday - b.weekday || a.startTime - b.startTime).map((l) => `
         <tr><td>${WEEKDAYS()[l.weekday - 1]}</td><td>${intToTime(l.startTime)}–${intToTime(l.endTime)}</td>
         <td>${esc(subjectName(l.subjectId))}</td><td>${esc(teacherName(l.teacherId))}</td><td>${esc(roomName(l.roomId))}</td>
@@ -417,7 +856,6 @@ function homework() {
   const el = $('#sec-homework');
   const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
   el.innerHTML = `
-    <h2>📝 Hausaufgaben</h2>
     <div class="panel"><div class="row">
       ${fld('hw-class', 'Klasse', 'select', hwClass ?? '', classOpts)}
       <button class="btn" onclick="hwClass=$('#hw-class').value; homework()">Anzeigen</button>
@@ -430,7 +868,7 @@ function homeworkBody() {
     <tr>
       <td>${intToDate(h.dueDate)}</td><td>${esc(subjectName(h.subjectId))}</td><td>${esc(teacherName(h.teacherId))}</td>
       <td>${esc(h.text)}</td>
-      <td>${h.isDone ? '<span class="badge" style="color:var(--ok)">erledigt</span>' : '<span class="badge">offen</span>'}</td>
+      <td>${h.isDone ? '<span class="badge ok">erledigt</span>' : '<span class="badge">offen</span>'}</td>
       <td><button class="btn danger" onclick="del('homework',${h.id})">✕</button></td>
     </tr>`).join('');
   return `
@@ -444,7 +882,7 @@ function homeworkBody() {
       </div>
     </div>
     <div class="panel"><h3>Hausaufgaben der ${esc(classOf(hwClass))}</h3>
-      <table><thead><tr><th>Fällig</th><th>Fach</th><th>Lehrer</th><th>Aufgabe</th><th>Status</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Fällig</th><th scope="col">Fach</th><th scope="col">Lehrer</th><th scope="col">Aufgabe</th><th scope="col">Status</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="6" class="empty">Keine Hausaufgaben</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -464,7 +902,6 @@ function absences() {
   const el = $('#sec-absences');
   const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
   el.innerHTML = `
-    <h2>🩺 Absenzen</h2>
     <div class="panel"><div class="row">
       ${fld('abs-class', 'Klasse', 'select', absClass ?? '', classOpts)}
       <button class="btn" onclick="absClass=$('#abs-class').value; absences()">Anzeigen</button>
@@ -478,7 +915,7 @@ function absencesBody() {
       <td>${intToDate(a.date)}</td><td>${intToTime(a.startTime)}–${intToTime(a.endTime)}</td>
       <td>${esc(classOf(a.classId))} · ${esc(studentNameById(a.studentId))}</td>
       <td>${esc(subjectName(a.subjectId))}</td><td>${esc(a.reason)}</td>
-      <td>${a.excused ? '<span class="badge" style="color:var(--ok)">entschuldigt</span>' : '<span class="badge" style="color:var(--bad)">unentschuldigt</span>'}</td>
+      <td>${a.excused ? '<span class="badge ok">entschuldigt</span>' : '<span class="badge warn">unentschuldigt</span>'}</td>
       <td><button class="btn danger" onclick="del('absences',${a.id})">✕</button></td>
     </tr>`).join('');
   const studentOpts = DB.students.filter((s) => s.classId === Number(absClass)).map((s) => ({ v: s.id, t: s.firstName + ' ' + s.lastName }));
@@ -496,7 +933,7 @@ function absencesBody() {
       </div>
     </div>
     <div class="panel"><h3>Absenzen der ${esc(classOf(absClass))}</h3>
-      <table><thead><tr><th>Datum</th><th>Zeit</th><th>Schüler</th><th>Fach</th><th>Grund</th><th>Status</th><th></th></tr></thead>
+      <table><thead><tr><th scope="col">Datum</th><th scope="col">Zeit</th><th scope="col">Schüler</th><th scope="col">Fach</th><th scope="col">Grund</th><th scope="col">Status</th><th scope="col"></th></tr></thead>
       <tbody>${rows || '<tr><td colspan="7" class="empty">Keine Absenzen</td></tr>'}</tbody></table>
     </div>`;
 }
@@ -533,7 +970,6 @@ function messages() {
       </div>
     </div>`).join('') || '<div class="empty">Keine Nachrichten</div>';
   el.innerHTML = `
-    <h2>✉️ Nachrichten</h2>
     <div class="panel" id="msg-form"><h3>Neue Nachricht</h3>
       <div class="row">
         ${fld('subject', 'Betreff', 'text', '', null, 'placeholder="Elternabend am…"')}
@@ -574,10 +1010,9 @@ async function toggleRead(id, read) {
 function data() {
   const el = $('#sec-data');
   el.innerHTML = `
-    <h2>💾 Daten</h2>
     <div class="panel">
       <h3>Datenspeicher</h3>
-      <p style="margin:0;color:var(--muted);font-size:13px">Alle Schuldaten liegen in <code>data/db.json</code> und werden bei jeder Änderung sofort gespeichert.</p>
+      <p class="muted" style="margin:0">Alle Schuldaten liegen in <code>data/db.json</code> und werden bei jeder Änderung sofort gespeichert.</p>
       <div class="actions">
         <button class="btn" onclick="exportDb()">⬇️ Exportieren (db.json)</button>
         <label class="btn" style="cursor:pointer">⬆️ Importieren<input type="file" accept="application/json" style="display:none" onchange="importDb(event)"></label>
@@ -586,7 +1021,7 @@ function data() {
     </div>
     <div class="panel">
       <h3>Rohdaten-Vorschau</h3>
-      <pre style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:420px;overflow:auto;font-size:12px;color:var(--muted)">${esc(JSON.stringify(DB, null, 2).slice(0, 8000))}</pre>
+      <pre class="raw">${esc(JSON.stringify(DB, null, 2).slice(0, 8000))}</pre>
     </div>`;
 }
 async function exportDb() {
@@ -641,6 +1076,27 @@ async function init() {
   $('#app').hidden = false;
   await load();
 }
+// ------------------------------------------------------ Theme (Hell/Dunkel)
+function effectiveTheme() {
+  if (document.documentElement.dataset.theme) return document.documentElement.dataset.theme;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function syncThemeButton() {
+  const btn = $('#theme-toggle');
+  if (btn) btn.textContent = effectiveTheme() === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('md3-theme', next);
+  syncThemeButton();
+}
+(function initTheme() {
+  const saved = localStorage.getItem('md3-theme');
+  if (saved) document.documentElement.dataset.theme = saved;
+  syncThemeButton();
+})();
+
 init();
 </script>
 </body>

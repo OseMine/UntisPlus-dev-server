@@ -795,6 +795,54 @@ app.get('/WebUntis/api/public/timetable/weekly/data', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// REST: exams (Prüfungen) – /api/exams, /api/classreg/exams, /api/exams/student/:id
+// ---------------------------------------------------------------------------
+
+app.get(['/WebUntis/api/exams', '/WebUntis/api/classreg/exams', '/WebUntis/api/exams/student/:id'], (req, res) => {
+  const startDate = Number(req.query.startDate || 0);
+  const endDate = Number(req.query.endDate || 0);
+
+  let exams = getStore().exams || [];
+
+  if (req.params.id !== undefined) {
+    const studentId = Number(req.params.id);
+    const student = getStore().students.find((s) => s.id === studentId);
+    if (!student) return res.json([]);
+    exams = exams.filter(
+      (e) => (e.studentIds || []).includes(studentId) || (e.classIds || []).includes(student.classId),
+    );
+  }
+
+  const list = exams
+    .filter((e) => (!startDate || Number(e.date) >= startDate) && (!endDate || Number(e.date) <= endDate))
+    .map(examPayload)
+    .sort((a, b) => Number(a.date) - Number(b.date) || Number(a.startTime) - Number(b.startTime));
+
+  res.json(list);
+});
+
+function examPayload(e) {
+  const teachers = Array.isArray(e.teachers) && e.teachers.length ? e.teachers : e.teacher ? [e.teacher] : [];
+  const rooms = Array.isArray(e.rooms) && e.rooms.length ? e.rooms : e.room ? [e.room] : [];
+  return {
+    id: e.id,
+    date: e.date,
+    examDate: e.examDate || e.date,
+    startTime: Number(e.startTime) || 0,
+    endTime: Number(e.endTime) || Number(e.startTime) || 0,
+    subject: e.subject,
+    name: e.subject,
+    examType: e.examType || '',
+    type: e.examType || '',
+    teachers,
+    teacher: teachers.join(', '),
+    rooms,
+    room: rooms.join(', '),
+    description: e.description || '',
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Admin panel
 // ---------------------------------------------------------------------------
 
@@ -825,6 +873,6 @@ https.createServer(httpsOptions, app).listen(PORT, '0.0.0.0', () => {
   console.log('\nWebUntis simulation:');
   console.log(`  JSON-RPC: POST /WebUntis/jsonrpc.do?school=${SCHOOL_NAME}  (authenticate, getKlassen, getTeachers, getSubjects, getRooms, getTimetable, getTimetableWithAbsences, getHomeWork2017, getHolidays, getCurrentSchoolyear, getMessagesOfDay2017, ...)`);
   console.log(`  JSON-RPC: POST /WebUntis/jsonrpc_intern.do?school=${SCHOOL_NAME}  (login-key auth)`);
-  console.log('  REST: /api/token/new, /api/rest/view/v1/messages (+permissions, +recipients/static/persons), /api/public/news/newsWidgetData, /api/public/timetable/weekly/data');
+  console.log('  REST: /api/token/new, /api/rest/view/v1/messages (+permissions, +recipients/static/persons), /api/public/news/newsWidgetData, /api/public/timetable/weekly/data, /api/exams (+/classreg/exams, +/student/:id)');
   console.log('\nUse https://YOUR_LOCAL_IP:3000 in Untis+ app (accept self-signed cert)');
 });

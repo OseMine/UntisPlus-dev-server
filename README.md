@@ -149,10 +149,11 @@ If `ADMIN_PASSWORD` is set in `.env`, the panel requires that password. Without 
 - `GET https://<ip>:3000/WebUntis/messageFileRequest.do?file=<id>` - Download attachment
 - `GET https://<ip>:3000/WebUntis/api/public/news/newsWidgetData` - Public news widget
 - `GET https://<ip>:3000/WebUntis/api/public/timetable/weekly/data` - Public weekly data
+- `GET https://<ip>:3000/WebUntis/api/exams?startDate=YYYYMMDD&endDate=YYYYMMDD` - Exams (also `/api/classreg/exams` and `/api/exams/student/<id>`)
 
 **Admin API** (`/api/admin/*`, see panel at `/admin`)
 - `GET /api/admin/bootstrap` - Full store
-- `POST|PUT|DELETE /api/admin/{classes|teachers|subjects|rooms|students|lessons|homework|absences|messages}` - CRUD
+- `POST|PUT|DELETE /api/admin/{classes|teachers|subjects|rooms|students|lessons|homework|absences|messages|exams}` - CRUD
 - `POST /api/admin/reset`, `POST /api/admin/import`, `GET /api/admin/export`
 
 ## Contributing

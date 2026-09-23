@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Untis+ Dev Server – Admin</title>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #1a2233; --panel2: #22304a; --border: #2c3a58;
+    --text: #e6ecf5; --muted: #8fa3c4; --accent: #4f8cff; --accent2: #2f6fe4;
+    --ok: #34d399; --warn: #fbbf24; --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+  .wrap { display: flex; min-height: 100vh; }
+  aside { width: 230px; background: var(--panel); border-right: 1px solid var(--border); padding: 16px 10px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  aside h1 { font-size: 15px; margin: 0 8px 14px; color: var(--accent); }
+  aside .sub { font-size: 11px; color: var(--muted); margin: -8px 8px 14px; }
+  aside button { display: block; width: 100%; text-align: left; background: none; border: none; color: var(--muted); padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 2px; }
+  aside button:hover { background: var(--panel2); color: var(--text); }
+  aside button.active { background: var(--accent2); color: #fff; }
+  main { flex: 1; padding: 24px 30px; max-width: 1200px; }
+  section { display: none; }
+  section.active { display: block; }
+  h2 { margin: 0 0 18px; font-size: 20px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .card .n { font-size: 26px; font-weight: 700; color: var(--accent); }
+  .card .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
+  .panel h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  tr:hover td { background: var(--panel2); }
+  input, select, textarea, button.btn {
+    background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent2); }
+  button.btn { background: var(--accent2); cursor: pointer; border: none; font-weight: 600; }
+  button.btn:hover { filter: brightness(1.15); }
+  button.btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  button.btn.danger { background: transparent; border: 1px solid var(--bad); color: var(--bad); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips label { display: flex; gap: 6px; align-items: center; font-size: 13px; background: var(--panel2); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; cursor: pointer; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--panel2); color: var(--muted); }
+  .badge.news { background: #1e3a5f; color: #7cc0ff; }
+  .badge.inbox { background: #2f4b2f; color: #7bd88a; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+  .grid { display: grid; grid-template-columns: 90px repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 12px; }
+  .grid > div { background: var(--panel); padding: 8px; min-height: 64px; }
+  .grid .head { background: var(--panel2); font-weight: 600; color: var(--muted); display: flex; align-items: center; }
+  .lesson { border-radius: 6px; padding: 5px 7px; margin-bottom: 5px; cursor: pointer; border: 1px solid rgba(255,255,255,.15); }
+  .lesson small { display: block; color: rgba(255,255,255,.8); font-size: 10px; }
+  .empty { color: var(--muted); font-size: 11px; text-align: center; padding: 12px 0; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--ok); color: #06251b; padding: 12px 18px; border-radius: 10px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.4); display: none; z-index: 10; }
+  .toast.err { background: var(--bad); color: #2b0a0a; }
+  #login { max-width: 360px; margin: 120px auto; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 30px; }
+  #login h1 { margin: 0 0 18px; font-size: 18px; color: var(--accent); }
+  .actions { display: flex; gap: 10px; margin-top: 12px; }
+  .msg { border-left: 3px solid var(--accent); padding: 8px 12px; margin-bottom: 8px; background: var(--panel2); border-radius: 0 8px 8px 0; font-size: 13px; }
+  .msg .mdate { color: var(--muted); font-size: 11px; }
+  .msg .mfrom { color: var(--muted); font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div id="login" hidden>
+  <h1>🔐 Admin-Login</h1>
+  <div class="field"><label>Passwort (ADMIN_PASSWORD)</label><input type="password" id="login-pass"></div>
+  <button class="btn" style="margin-top:14px" onclick="doLogin()">Anmelden</button>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <aside>
+    <h1>🛠 Untis+ Dev Server</h1>
+    <div class="sub">Admin-Panel · Daten in <code>data/db.json</code></div>
+    <button data-sec="dashboard" class="active" onclick="show('dashboard')">📊 Dashboard</button>
+    <button data-sec="classes" onclick="show('classes')">🏫 Klassen</button>
+    <button data-sec="teachers" onclick="show('teachers')">👩🏫 Lehrer</button>
+    <button data-sec="subjects" onclick="show('subjects')">📚 Fächer</button>
+    <button data-sec="rooms" onclick="show('rooms')">🚪 Räume</button>
+    <button data-sec="students" onclick="show('students')">🧑‍🎓 Schüler</button>
+    <button data-sec="timetable" onclick="show('timetable')">🗓 Stundenplan</button>
+    <button data-sec="homework" onclick="show('homework')">📝 Hausaufgaben</button>
+    <button data-sec="absences" onclick="show('absences')">🩺 Absenzen</button>
+    <button data-sec="messages" onclick="show('messages')">✉️ Nachrichten</button>
+    <button data-sec="data" onclick="show('data')">💾 Daten</button>
+  </aside>
+
+  <main>
+    <section id="sec-dashboard" class="active"></section>
+    <section id="sec-classes"></section>
+    <section id="sec-teachers"></section>
+    <section id="sec-subjects"></section>
+    <section id="sec-rooms"></section>
+    <section id="sec-students"></section>
+    <section id="sec-timetable"></section>
+    <section id="sec-homework"></section>
+    <section id="sec-absences"></section>
+    <section id="sec-messages"></section>
+    <section id="sec-data"></section>
+  </main>
+</div>
+
+<script>
+"use strict";
+const $ = (s, root) => (root || document).querySelector(s);
+const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
+let DB = { classes: [], teachers: [], subjects: [], rooms: [], students: [], lessons: [], homework: [], absences: [], messages: [], school: {}, schoolYear: {} };
+
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function toast(msg, isErr) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.style.display = 'block';
+  clearTimeout(t._h);
+  t._h = setTimeout(() => { t.style.display = 'none'; }, 2600);
+}
+async function api(method, path, body) {
+  const res = await fetch(path, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+    credentials: 'same-origin',
+  });
+  if (res.status === 401) { location.reload(); throw new Error('Unauthorized'); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+async function load() {
+  DB = await api('GET', '/api/admin/bootstrap');
+  renderAll();
+}
+function show(section) {
+  $$('aside button').forEach((b) => b.classList.toggle('active', b.dataset.sec === section));
+  $$('main section').forEach((s) => s.classList.toggle('active', s.id === 'sec-' + section));
+  renderSection(section);
+}
+function renderAll() {
+  $$('main section').forEach((s) => { if (s.classList.contains('active')) renderSection(s.id.replace('sec-', '')); });
+}
+function renderSection(sec) {
+  const fns = { dashboard, classes, teachers, subjects, rooms, students, timetable, homework, absences, messages, data };
+  if (fns[sec]) fns[sec]();
+}
+function byId(list, id) { return list.find((x) => x.id === id); }
+function classOf(id) { const c = byId(DB.classes, id); return c ? c.name : '?'; }
+function teacherName(id) { const t = byId(DB.teachers, id); return t ? (t.longName || t.name) : '?'; }
+function subjectName(id) { const s = byId(DB.subjects, id); return s ? s.name : '?'; }
+function roomName(id) { const r = byId(DB.rooms, id); return r ? r.name : '?'; }
+function intToTime(v) { v = String(v || 0).padStart(4, '0'); return v.slice(0, 2) + ':' + v.slice(2); }
+function timeToInt(v) { if (!v) return 0; return parseInt(v.replace(':', ''), 10); }
+function intToDate(v) { const s = String(v || ''); if (s.length !== 8) return ''; return s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8); }
+function dateToInt(v) { if (!v) return 0; return parseInt(v.replace(/-/g, ''), 10); }
+function nowInt() { const d = new Date(); return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); }
+function fmtDate(ms) {
+  if (!ms) return '';
+  return new Date(ms).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function WEEKDAYS() { return ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag']; }
+const PERIOD_TIMES = [[745, 830], [835, 920], [935, 1020], [1025, 1110], [1120, 1205], [1235, 1320], [1325, 1410]];
+
+async function mutate(method, path, body, msg) {
+  try { await api(method, path, body); await load(); if (msg) toast(msg); }
+  catch (e) { toast(e.message, true); }
+}
+function crudForm(collection, fields, onSubmit) { /* fields: [{key,label,type,options|color}] */ }
+
+// ---------------------------------------------------------------- Dashboard
+function dashboard() {
+  const el = $('#sec-dashboard');
+  const counts = {
+    Klassen: DB.classes.length, Lehrer: DB.teachers.length, Fächer: DB.subjects.length,
+    Räume: DB.rooms.length, Schüler: DB.students.length, 'Unterrichtsstunden (Woche)': DB.lessons.length,
+    Hausaufgaben: DB.homework.length, Absenzen: DB.absences.length, Nachrichten: DB.messages.length,
+  };
+  let cards = Object.entries(counts).map(([l, n]) => `<div class="card"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  el.innerHTML = `
+    <h2>📊 Dashboard</h2>
+    <div class="panel">
+      <h3>Schule</h3>
+      <p style="margin:0"><b>${esc(DB.school.longName || DB.school.name)}</b> · Schuljahr <b>${esc(DB.schoolYear.name || '')}</b> · Daten-Pfad: <code>data/db.json</code></p>
+    </div>
+    <div class="cards">${cards}</div>
+    <div class="panel">
+      <h3>Schnellzugriff</h3>
+      <div class="actions">
+        <button class="btn" onclick="show('timetable')">🗓 Stundenplan bearbeiten</button>
+        <button class="btn" onclick="show('messages')">✉️ Nachricht erstellen</button>
+        <button class="btn ghost" onclick="exportDb()">⬇️ Export (db.json)</button>
+        <button class="btn danger" onclick="resetDb()">♻️ Daten zurücksetzen</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Wie funktioniert es?</h3>
+      <p style="color:var(--muted);font-size:13px;line-height:1.6;margin:0">
+        Alle Änderungen hier werden sofort in <code>data/db.json</code> gespeichert und von der simulierten WebUntis-API ausgeliefert.
+        Der Test-Account <b>testuser</b> ist Schüler <b>Max Mustermann (id 123)</b> aus der <b>${esc(classOf(45))}</b>.
+        Melde dich in der Untis+ App an und wechsle ggf. die Klasse, um deine Änderungen zu sehen.
+      </p>
+    </div>`;
+}
+
+// ------------------------------------------------------------ generische Tabellen
+function tableFormRow(formId, onSubmit) {
+  return `<div class="row" style="margin-top:12px">
+    ${formId}
+    <button class="btn" onclick="${onSubmit}">Hinzufügen</button>
+  </div>`;
+}
+function fld(key, label, type = 'text', value = '', options = null, extra = '') {
+  if (type === 'select') {
+    const opts = (options || []).map((o) => `<option value="${esc(o.v)}" ${String(o.v) === String(value) ? 'selected' : ''}>${esc(o.t)}</option>`).join('');
+    return `<div class="field"><label>${label}</label><select data-k="${key}" ${extra}>${opts}</select></div>`;
+  }
+  if (type === 'color') return `<div class="field"><label>${label}</label><input data-k="${key}" type="color" value="${esc(value || '#3B82F6')}"></div>`;
+  return `<div class="field"><label>${label}</label><input data-k="${key}" type="${type}" value="${esc(value)}" ${extra}></div>`;
+}
+function collectForm(root) {
+  const out = {};
+  $$('[data-k]', root).forEach((i) => { const k = i.dataset.k; out[k] = i.type === 'checkbox' ? i.checked : i.value; });
+  return out;
+}
+
+function classes() {
+  const el = $('#sec-classes');
+  const options = DB.teachers.map((t) => ({ v: t.id, t: t.longName || t.name }));
+  const rows = DB.classes.map((c) => `
+    <tr>
+      <td><b>${esc(c.name)}</b></td><td>${esc(c.longName)}</td>
+      <td>${teacherName(c.teacherId)}</td><td>${roomName(c.roomId)}</td>
+      <td>${DB.students.filter((s) => s.classId === c.id).length}</td>
+      <td><button class="btn danger" onclick="del('classes',${c.id})">✕</button></td>
+    </tr>`).join('');
+  el.innerHTML = `
+    <h2>🏫 Klassen</h2>
+    <div class="panel"><h3>Neue Klasse</h3>${tableFormRow(
+      fld('name', 'Kürzel', 'text', '', null, 'placeholder="5A"') +
+      fld('longName', 'Name', 'text', '', null, 'placeholder="Klasse 5A"') +
+      fld('teacherId', 'Klassenlehrer', 'select', '', options) +
+      fld('roomId', 'Kassenraum', 'select', '', DB.rooms.map((r) => ({ v: r.id, t: r.name }))),
+      "add('classes')")}
+    </div>
+    <div class="panel"><h3>Alle Klassen</h3>
+      <table><thead><tr><th>Kürzel</th><th>Name</th><th>Klassenlehrer</th><th>Raum</th><th>Schüler</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" class="empty">Keine Klassen vorhanden</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+function teachers() {
+  const el = $('#sec-teachers');
+  const rows = DB.teachers.map((t) => `
+    <tr><td>${esc(t.name)}</td><td>${esc(t.longName)}</td><td>${esc(t.email)}</td><td>${esc(t.initials)}</td>
+    <td><button class="btn danger" onclick="del('teachers',${t.id})">✕</button></td></tr>`).join('');
+  el.innerHTML = `
+    <h2>👩‍🏫 Lehrer (${DB.teachers.length})</h2>
+    <div class="panel"><h3>Neuer Lehrer</h3>${tableFormRow(
+      fld('name', 'Name (Nachname, Vorname)', 'text', '', null, 'placeholder="Weber, Anna"') +
+      fld('longName', 'Anrede/Anzeigename', 'text', '', null, 'placeholder="Frau Weber"') +
+      fld('email', 'E-Mail', 'text', '', null, 'placeholder="a.weber@demo.schule"') +
+      fld('initials', 'Kürzel', 'text', '', null, 'placeholder="AW"'),
+      "add('teachers')")}
+    </div>
+    <div class="panel"><h3>Alle Lehrer</h3>
+      <table><thead><tr><th>Name</th><th>Anzeigename</th><th>E-Mail</th><th>Kürzel</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5" class="empty">Keine Lehrer vorhanden</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+function subjects() {
+  const el = $('#sec-subjects');
+  const rows = DB.subjects.map((s) => `
+    <tr><td><span class="dot" style="background:${esc(s.color || '#3B82F6')}"></span><b>${esc(s.name)}</b></td>
+    <td>${esc(s.longName)}</td><td>${esc(s.color)}</td>
+    <td><button class="btn danger" onclick="del('subjects',${s.id})">✕</button></td></tr>`).join('');
+  el.innerHTML = `
+    <h2>📚 Fächer (${DB.subjects.length})</h2>
+    <div class="panel"><h3>Neues Fach</h3>${tableFormRow(
+      fld('name', 'Kürzel', 'text', '', null, 'placeholder="M"') +
+      fld('longName', 'Name', 'text', '', null, 'placeholder="Mathematik"') +
+      fld('color', 'Farbe', 'color'), "add('subjects')")}
+    </div>
+    <div class="panel"><h3>Alle Fächer</h3>
+      <table><thead><tr><th>Fach</th><th>Name</th><th>Farbe</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4" class="empty">Keine Fächer vorhanden</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+function rooms() {
+  const el = $('#sec-rooms');
+  const rows = DB.rooms.map((r) => `
+    <tr><td><b>${esc(r.name)}</b></td><td>${esc(r.longName)}</td>
+    <td><button class="btn danger" onclick="del('rooms',${r.id})">✕</button></td></tr>`).join('');
+  el.innerHTML = `
+    <h2>🚪 Räume (${DB.rooms.length})</h2>
+    <div class="panel"><h3>Neuer Raum</h3>${tableFormRow(
+      fld('name', 'Kürzel', 'text', '', null, 'placeholder="R101"') +
+      fld('longName', 'Name', 'text', '', null, 'placeholder="Raum 101"'), "add('rooms')")}
+    </div>
+    <div class="panel"><h3>Alle Räume</h3>
+      <table><thead><tr><th>Kürzel</th><th>Name</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="3" class="empty">Keine Räume vorhanden</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+function students() {
+  const el = $('#sec-students');
+  const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
+  const rows = DB.students.map((s) => `
+    <tr><td>${esc(s.lastName)}, ${esc(s.firstName)}</td><td>${esc(classOf(s.classId))}</td><td>#${s.id}</td>
+    <td><button class="btn danger" onclick="del('students',${s.id})">✕</button></td></tr>`).join('');
+  el.innerHTML = `
+    <h2>🧑‍🎓 Schüler (${DB.students.length})</h2>
+    <div class="panel"><h3>Neuer Schüler</h3>${tableFormRow(
+      fld('firstName', 'Vorname', 'text', '', null, 'placeholder="Emma"') +
+      fld('lastName', 'Nachname', 'text', '', null, 'placeholder="Braun"') +
+      fld('classId', 'Klasse', 'select', '', classOpts), "add('students')")}
+    </div>
+    <div class="panel"><h3>Alle Schüler</h3>
+      <table><thead><tr><th>Name</th><th>Klasse</th><th>ID</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4" class="empty">Keine Schüler vorhanden</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+// ------------------------------------------------------------- Stundenplan
+let ttClass = null, ttEdit = null;
+function timetable() {
+  const el = $('#sec-timetable');
+  const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
+  el.innerHTML = `
+    <h2>🗓 Stundenplan</h2>
+    <div class="panel">
+      <div class="row">
+        ${fld('tt-class', 'Klasse', 'select', ttClass ?? '', classOpts)}
+        <button class="btn" onclick="ttClass=$('#tt-class').value; timetable()">Anzeigen</button>
+      </div>
+    </div>
+    <div id="tt-body">${ttClass ? timetableBody() : '<div class="empty">Bitte zuerst eine Klasse wählen.</div>'}</div>`;
+}
+function timetableBody() {
+  const lessons = DB.lessons.filter((l) => l.classId === Number(ttClass));
+  const byKey = {};
+  lessons.forEach((l) => { const k = l.weekday + '-' + l.period; (byKey[k] = byKey[k] || []).push(l); });
+  const head = ['Zeit', ...WEEKDAYS().map((d) => `<div class="head">${d}</div>`)].join('');
+  const cells = [];
+  for (let p = 1; p <= 7; p++) {
+    cells.push(`<div class="head">${p}. Std.<br><small style="color:var(--muted)">${intToTime(PERIOD_TIMES[p - 1][0])}–${intToTime(PERIOD_TIMES[p - 1][1])}</small></div>`);
+    for (let wd = 1; wd <= 5; wd++) {
+      const list = byKey[wd + '-' + p] || [];
+      const html = list.map((l) => {
+        const subj = byId(DB.subjects, l.subjectId);
+        return `<div class="lesson" style="background:${esc(subj ? subj.color : '#3B82F6')}" onclick="ttEdit=${l.id}; timetable()" title="Klicken zum Bearbeiten">
+          <b>${esc(subjectName(l.subjectId))}</b><small>${esc(teacherName(l.teacherId))} · ${esc(roomName(l.roomId))}</small>
+        </div>`;
+      }).join('');
+      cells.push(`<div>${html || '<div class="empty">—</div>'}</div>`);
+    }
+  }
+  const form = ttForm();
+  return `
+    <div class="panel">
+      <h3>${ttClass ? 'Klasse ' + esc(classOf(ttClass)) : 'Stundenplan'}</h3>
+      <div class="grid">${head}${cells.join('')}</div>
+    </div>
+    ${form}
+    <div class="panel"><h3>Alle Stunden dieser Klasse</h3>
+      <table><thead><tr><th>Tag</th><th>Zeit</th><th>Fach</th><th>Lehrer</th><th>Raum</th><th></th></tr></thead>
+      <tbody>${lessons.sort((a, b) => a.weekday - b.weekday || a.startTime - b.startTime).map((l) => `
+        <tr><td>${WEEKDAYS()[l.weekday - 1]}</td><td>${intToTime(l.startTime)}–${intToTime(l.endTime)}</td>
+        <td>${esc(subjectName(l.subjectId))}</td><td>${esc(teacherName(l.teacherId))}</td><td>${esc(roomName(l.roomId))}</td>
+        <td><button class="btn ghost" onclick="ttEdit=${l.id}; timetable()">✏️</button> <button class="btn danger" onclick="del('lessons',${l.id})">✕</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">Noch keine Stunden</td></tr>'}
+      </tbody></table>
+    </div>`;
+}
+function ttForm() {
+  const l = ttEdit ? byId(DB.lessons, ttEdit) : null;
+  const weekday = l ? l.weekday : 1;
+  const period = l ? l.period : 1;
+  const periodOpts = PERIOD_TIMES.map((p, i) => ({ v: i + 1, t: `${i + 1}. Std. (${intToTime(p[0])}–${intToTime(p[1])})` }));
+  const time = PERIOD_TIMES[period - 1];
+  return `<div class="panel" id="tt-form"><h3>${ttEdit ? 'Stunde bearbeiten (#' + ttEdit + ')' : 'Neue Stunde'}</h3><div class="row">
+    ${fld('weekday', 'Wochentag', 'select', weekday || '', WEEKDAYS().map((d, i) => ({ v: i + 1, t: d })))}
+    ${fld('period', 'Stunde', 'select', period || '', periodOpts)}
+    ${fld('subjectId', 'Fach', 'select', l && l.subjectId || '', DB.subjects.map((s) => ({ v: s.id, t: s.name })))}
+    ${fld('teacherId', 'Lehrer', 'select', l && l.teacherId || '', DB.teachers.map((t) => ({ v: t.id, t: t.longName || t.name })))}
+    ${fld('roomId', 'Raum', 'select', l && l.roomId || '', DB.rooms.map((r) => ({ v: r.id, t: r.name })))}
+    <button class="btn" onclick="saveLesson()">${ttEdit ? 'Speichern' : 'Hinzufügen'}</button>
+    ${ttEdit ? '<button class="btn ghost" onclick="ttEdit=null; timetable()">Abbrechen</button>' : ''}
+  </div></div>`;
+}
+async function saveLesson() {
+  const form = $('#tt-form');
+  const wd = Number($('[data-k="weekday"]', form).value);
+  const period = Number($('[data-k="period"]', form).value);
+  const base = { classId: Number(ttClass), weekday: wd, period, startTime: PERIOD_TIMES[period - 1][0], endTime: PERIOD_TIMES[period - 1][1] };
+  const extra = collectForm(form);
+  delete extra.weekday; delete extra.period;
+  const item = { ...base, ...extra };
+  if (ttEdit) { await mutate('PUT', '/api/admin/lessons/' + ttEdit, item, 'Stunde aktualisiert'); ttEdit = null; }
+  else { item.id = undefined; await mutate('POST', '/api/admin/lessons', item, 'Stunde hinzugefügt'); }
+  timetable();
+}
+
+// ------------------------------------------------------------ Hausaufgaben
+let hwClass = null;
+function homework() {
+  const el = $('#sec-homework');
+  const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
+  el.innerHTML = `
+    <h2>📝 Hausaufgaben</h2>
+    <div class="panel"><div class="row">
+      ${fld('hw-class', 'Klasse', 'select', hwClass ?? '', classOpts)}
+      <button class="btn" onclick="hwClass=$('#hw-class').value; homework()">Anzeigen</button>
+    </div></div>
+    <div id="hw-body">${hwClass ? homeworkBody() : '<div class="empty">Bitte zuerst eine Klasse wählen.</div>'}</div>`;
+}
+function homeworkBody() {
+  const list = DB.homework.filter((h) => h.classId === Number(hwClass)).sort((a, b) => a.dueDate - b.dueDate);
+  const rows = list.map((h) => `
+    <tr>
+      <td>${intToDate(h.dueDate)}</td><td>${esc(subjectName(h.subjectId))}</td><td>${esc(teacherName(h.teacherId))}</td>
+      <td>${esc(h.text)}</td>
+      <td>${h.isDone ? '<span class="badge" style="color:var(--ok)">erledigt</span>' : '<span class="badge">offen</span>'}</td>
+      <td><button class="btn danger" onclick="del('homework',${h.id})">✕</button></td>
+    </tr>`).join('');
+  return `
+    <div class="panel" id="hw-form"><h3>Neue Hausaufgabe für ${esc(classOf(hwClass))}</h3>
+      <div class="row">
+        ${fld('subjectId', 'Fach', 'select', '', DB.subjects.map((s) => ({ v: s.id, t: s.name })))}
+        ${fld('teacherId', 'Lehrer', 'select', '', DB.teachers.map((t) => ({ v: t.id, t: t.longName || t.name })))}
+        ${fld('dueDate', 'Fällig am', 'date', intToDate(nowInt() + 3))}
+        ${fld('text', 'Aufgabe', 'text', '', null, 'placeholder="Bearbeite die Aufgaben…"')}
+        <button class="btn" onclick="addHomework()">Hinzufügen</button>
+      </div>
+    </div>
+    <div class="panel"><h3>Hausaufgaben der ${esc(classOf(hwClass))}</h3>
+      <table><thead><tr><th>Fällig</th><th>Fach</th><th>Lehrer</th><th>Aufgabe</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" class="empty">Keine Hausaufgaben</td></tr>'}</tbody></table>
+    </div>`;
+}
+async function addHomework() {
+  const form = $('#hw-form');
+  const item = { classId: Number(hwClass), ...collectForm(form) };
+  const lesson = DB.lessons.find((l) => l.classId === Number(hwClass) && l.subjectId === Number(item.subjectId)) || DB.lessons.find((l) => l.classId === Number(hwClass));
+  item.lessonId = lesson ? lesson.id : 1;
+  item.dueDate = dateToInt(item.dueDate);
+  await mutate('POST', '/api/admin/homework', item, 'Hausaufgabe hinzugefügt');
+  homework();
+}
+
+// --------------------------------------------------------------- Absenzen
+let absClass = null;
+function absences() {
+  const el = $('#sec-absences');
+  const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
+  el.innerHTML = `
+    <h2>🩺 Absenzen</h2>
+    <div class="panel"><div class="row">
+      ${fld('abs-class', 'Klasse', 'select', absClass ?? '', classOpts)}
+      <button class="btn" onclick="absClass=$('#abs-class').value; absences()">Anzeigen</button>
+    </div></div>
+    <div id="abs-body">${absClass ? absencesBody() : '<div class="empty">Bitte zuerst eine Klasse wählen.</div>'}</div>`;
+}
+function absencesBody() {
+  const list = DB.absences.filter((a) => a.classId === Number(absClass)).sort((a, b) => a.date - b.date);
+  const rows = list.map((a) => `
+    <tr>
+      <td>${intToDate(a.date)}</td><td>${intToTime(a.startTime)}–${intToTime(a.endTime)}</td>
+      <td>${esc(classOf(a.classId))} · ${esc(studentNameById(a.studentId))}</td>
+      <td>${esc(subjectName(a.subjectId))}</td><td>${esc(a.reason)}</td>
+      <td>${a.excused ? '<span class="badge" style="color:var(--ok)">entschuldigt</span>' : '<span class="badge" style="color:var(--bad)">unentschuldigt</span>'}</td>
+      <td><button class="btn danger" onclick="del('absences',${a.id})">✕</button></td>
+    </tr>`).join('');
+  const studentOpts = DB.students.filter((s) => s.classId === Number(absClass)).map((s) => ({ v: s.id, t: s.firstName + ' ' + s.lastName }));
+  return `
+    <div class="panel" id="abs-form"><h3>Neue Absenz für ${esc(classOf(absClass))}</h3>
+      <div class="row">
+        ${fld('studentId', 'Schüler', 'select', '', studentOpts)}
+        ${fld('date', 'Datum', 'date', intToDate(nowInt() + 1))}
+        ${fld('startTime', 'Beginn', 'time', '08:35')}
+        ${fld('endTime', 'Ende', 'time', '09:20')}
+        ${fld('subjectId', 'Fach', 'select', '', DB.subjects.map((s) => ({ v: s.id, t: s.name })))}
+        ${fld('reason', 'Grund', 'text', '', null, 'placeholder="Krankheit"')}
+        <div class="field"><label>Entschuldigt</label><input data-k="excused" type="checkbox" checked></div>
+        <button class="btn" onclick="addAbsence()">Hinzufügen</button>
+      </div>
+    </div>
+    <div class="panel"><h3>Absenzen der ${esc(classOf(absClass))}</h3>
+      <table><thead><tr><th>Datum</th><th>Zeit</th><th>Schüler</th><th>Fach</th><th>Grund</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7" class="empty">Keine Absenzen</td></tr>'}</tbody></table>
+    </div>`;
+}
+function studentNameById(id) {
+  const s = byId(DB.students, id);
+  return s ? s.firstName + ' ' + s.lastName : '?';
+}
+async function addAbsence() {
+  const form = $('#abs-form');
+  const item = collectForm(form);
+  item.classId = Number(absClass);
+  item.date = dateToInt(item.date);
+  item.startTime = timeToInt(item.startTime);
+  item.endTime = timeToInt(item.endTime);
+  await mutate('POST', '/api/admin/absences', item, 'Absenz hinzugefügt');
+  absences();
+}
+
+// -------------------------------------------------------------- Nachrichten
+function messages() {
+  const el = $('#sec-messages');
+  const inbox = DB.messages.filter((m) => m.scope === 'inbox');
+  const news = DB.messages.filter((m) => m.scope === 'news');
+  const classOpts = DB.classes.map((c) => ({ v: c.id, t: c.name }));
+  const listHtml = (list) => list.map((m) => `
+    <div class="msg" style="${m.read ? 'opacity:.65' : ''}">
+      <div class="mfrom">📨 ${esc(m.sender)} · ${fmtDate(m.sent)} · ${m.scope === 'news' ? '<span class="badge news">News</span>' : '<span class="badge inbox">Inbox</span>'}
+      ${m.recipients && m.recipients.length ? ' → ' + esc(m.recipients.map((r) => classOf(r.id)).join(', ')) : ' → <i>alle</i>'}
+      </div>
+      <b>${esc(m.subject)}</b><br>${esc(m.content)}
+      <div class="actions">
+        <button class="btn ghost" onclick="toggleRead(${m.id}, ${!m.read})">${m.read ? 'Als ungelesen' : 'Als gelesen'}</button>
+        <button class="btn danger" onclick="del('messages',${m.id})">✕</button>
+      </div>
+    </div>`).join('') || '<div class="empty">Keine Nachrichten</div>';
+  el.innerHTML = `
+    <h2>✉️ Nachrichten</h2>
+    <div class="panel" id="msg-form"><h3>Neue Nachricht</h3>
+      <div class="row">
+        ${fld('subject', 'Betreff', 'text', '', null, 'placeholder="Elternabend am…"')}
+        ${fld('sender', 'Absender', 'text', 'Schulleitung')}
+      </div>
+      <div style="margin-top:10px"><textarea data-k="content" rows="3" style="width:100%" placeholder="Nachrichtentext…"></textarea></div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label>Sichtbarkeit</label>
+          <select data-k="scope"><option value="news">News (für alle sichtbar)</option><option value="inbox">Inbox (an Klassen)</option></select>
+        </div>
+        <div class="field"><label>Empfänger-Klassen (leer = an alle)</label>
+          <div class="chips" id="msg-chips">${classOpts.map((o) => `<label><input type="checkbox" value="${o.v}"> ${esc(o.t)}</label>`).join('') || '<span class="empty">Keine Klassen</span>'}</div>
+        </div>
+        <button class="btn" onclick="addMessage()">Senden</button>
+      </div>
+    </div>
+    <div class="panel"><h3>📥 Inbox (${inbox.length})</h3>${listHtml(inbox)}</div>
+    <div class="panel"><h3>📢 News (${news.length})</h3>${listHtml(news)}</div>`;
+}
+async function addMessage() {
+  const form = $('#msg-form');
+  const item = collectForm(form);
+  const selected = $$('#msg-chips input:checked').map((c) => ({ id: Number(c.value), type: 'CLASS' }));
+  item.recipients = selected;
+  item.sent = Date.now();
+  item.read = false;
+  item.attachments = [];
+  delete item['']; // safety
+  if (!item.subject.trim() || !item.content.trim()) { toast('Betreff und Inhalt dürfen nicht leer sein', true); return; }
+  await mutate('POST', '/api/admin/messages', item, 'Nachricht gesendet');
+  messages();
+}
+async function toggleRead(id, read) {
+  await mutate('PUT', '/api/admin/messages/' + id, { read }, read ? 'Als gelesen markiert' : 'Als ungelesen markiert');
+}
+
+// ------------------------------------------------------------------- Daten
+function data() {
+  const el = $('#sec-data');
+  el.innerHTML = `
+    <h2>💾 Daten</h2>
+    <div class="panel">
+      <h3>Datenspeicher</h3>
+      <p style="margin:0;color:var(--muted);font-size:13px">Alle Schuldaten liegen in <code>data/db.json</code> und werden bei jeder Änderung sofort gespeichert.</p>
+      <div class="actions">
+        <button class="btn" onclick="exportDb()">⬇️ Exportieren (db.json)</button>
+        <label class="btn" style="cursor:pointer">⬆️ Importieren<input type="file" accept="application/json" style="display:none" onchange="importDb(event)"></label>
+        <button class="btn danger" onclick="resetDb()">♻️ Auf Startdaten zurücksetzen</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Rohdaten-Vorschau</h3>
+      <pre style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:420px;overflow:auto;font-size:12px;color:var(--muted)">${esc(JSON.stringify(DB, null, 2).slice(0, 8000))}</pre>
+    </div>`;
+}
+async function exportDb() {
+  const res = await fetch('/api/admin/export');
+  const blob = await res.blob();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'db.json';
+  a.click();
+  toast('Export gestartet');
+}
+async function resetDb() {
+  if (!confirm('Wirklich alle Daten auf die Startdaten zurücksetzen?')) return;
+  await mutate('POST', '/api/admin/reset', null, 'Daten zurückgesetzt');
+}
+async function importDb(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    await mutate('POST', '/api/admin/import', JSON.parse(text), 'Daten importiert');
+  } catch (e) { toast('Import fehlgeschlagen: ' + e.message, true); }
+}
+
+// ------------------------------------------------------------- gemeinsame CRUD
+async function add(collection) {
+  const sec = document.querySelector('section.active');
+  const item = collectForm(sec);
+  delete item[''];
+  await mutate('POST', '/api/admin/' + collection, item, 'Hinzugefügt');
+}
+async function del(collection, id) {
+  if (!confirm('Wirklich löschen?')) return;
+  await mutate('DELETE', '/api/admin/' + collection + '/' + id, null, 'Gelöscht');
+}
+
+// ------------------------------------------------------------------- Login
+async function doLogin() {
+  try {
+    await api('POST', '/api/admin/login', { password: $('#login-pass').value });
+    location.reload();
+  } catch (e) { toast('Falsches Passwort', true); }
+}
+async function init() {
+  try {
+    const res = await fetch('/api/admin/auth');
+    if (res.status === 404) { $('#app').hidden = false; return load(); } // kein ADMIN_PASSWORD gesetzt
+    const auth = await res.json();
+    if (!auth.authed) { $('#login').hidden = false; return; }
+  } catch { $('#login').hidden = false; return; }
+  $('#login').hidden = true;
+  $('#app').hidden = false;
+  await load();
+}
+init();
+</script>
+</body>
+</html>

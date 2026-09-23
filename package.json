@@ -1,0 +1,21 @@
+{
+  "name": "untisplus-dev-server",
+  "version": "1.0.0",
+  "description": "Dev server to simulate WebUntis API for Untis+ app",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "selfsigned": "^5.5.0"
+  }
+}
